@@ -29,8 +29,9 @@ public:
 	void* allocate(int bytes_for_object) {
 		size_t bytes_required = bytes_for_object + sizeof(_psize);
 
-		if (bytes_required > bytes_remaining())
+		if (bytes_required > bytes_remaining()) {
 			return NULL;
+		}
 
 		// The layout is { object, object_size_in_bytes }
 		void *p_obj  = (void*) (arr + offset);
