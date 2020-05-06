@@ -1,13 +1,4 @@
-/*
- * Tests for StackAllocator & co.
- *   compile: clang++ -std=c++11 test.cpp
- *
- * Ben Hallstein, 18.4.15
- *
- */
-
-#include <cstdio>
-#include <cassert>
+#include "_test.h"
 
 #define __PSA_PSIZE_TYPE uint8_t
 	// The size of our objects does not exceed 256 bytes
@@ -16,15 +7,6 @@
 #include "../StackAllocator_Poppable.h"
 #include "../StackAllocator_PoppableAndStretchy.h"
 
-#define p_assert(x) do {       \
-		printf("%60s", #x);      \
-		assert(x);               \
-		printf(" - PASS :)\n");  \
-	} while (false)
-
-#define p_header(s) do {       \
-		printf("  %s  \n", s);   \
-	} while (false)
 
 void test_StackAllocator() {
 	StackAllocator sa(35);
