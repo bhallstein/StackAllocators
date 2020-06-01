@@ -1,67 +1,67 @@
 //
-// StackAllocator_Stretchy.h
+// StackAllocator_Expand.h
 //
 // - StackAllocator has a fixed size
-// - StackAllocator_Stretchy manages a vector of StackAllocators, adding
+// - StackAllocator_Expand manages a vector of StackAllocators, adding
 //   them as necessary, thus providing somewhat flexible storage
 // - Each added allocator is twice the size of the previous one
 //
 
-#ifndef __StackAllocator_Stretchy_h
-#define __StackAllocator_Stretchy_h
+#ifndef __StackAllocator_Expand_h
+#define __StackAllocator_Expand_h
 
 #include <vector>
 #include "StackAllocator.h"
 
-class StackAllocator_Stretchy {
+class StackAllocator_Expand {
 public:
-	StackAllocator_Stretchy(int initial_size = -1)
-	{
-		if (initial_size != -1) {
-			size = initial_size;
-		}
-		allocators.push_back(new StackAllocator(size));
-	}
-	~StackAllocator_Stretchy()
-	{
-		for (auto sa : allocators) { delete sa; }
-	}
+  StackAllocator_Expand(int initial_size = -1)
+  {
+    if (initial_size != -1) {
+      size = initial_size;
+    }
+    allocators.push_back(new StackAllocator(size));
+  }
+  ~StackAllocator_Expand()
+  {
+    for (auto sa : allocators) { delete sa; }
+  }
 
-	template<class T>
-	T* allocate() {
-		return (T*) allocate(sizeof(T));
-	}
-	void* allocate(int bytes_for_object) {
-		void *x = currentAllocator()->allocate(bytes_for_object);
-		if (!x) {
-			expand();
-			x = currentAllocator()->allocate(bytes_for_object);
-		}
-		return x;
-	}
+  template<class T>
+  T* allocate() {
+    return (T*) allocate(sizeof(T));
+  }
+  void* allocate(int bytes_for_object) {
+    void *x = currentAllocator()->allocate(bytes_for_object);
+    if (!x) {
+      expand();
+      x = currentAllocator()->allocate(bytes_for_object);
+    }
+    return x;
+  }
 
 private:
-	StackAllocator_Stretchy(const StackAllocator_Stretchy &) { }
-	StackAllocator_Stretchy operator= (const StackAllocator_Stretchy &) { return StackAllocator_Stretchy(); }
+  StackAllocator_Expand(const StackAllocator_Expand &) { }
+  StackAllocator_Expand operator= (const StackAllocator_Expand &) { return StackAllocator_Expand(); }
 
-	int size = 128;
-	std::vector<StackAllocator*> allocators;
+  int size = 128;
+  std::vector<StackAllocator*> allocators;
 
-	void expand() {
-		allocators.push_back(new StackAllocator(size *= 2));
-	}
-	void contractIfLastEmpty() {
-		if (allocators.size() < 2) return;
-		StackAllocator *sa = currentAllocator();
-		if (sa->isEmpty()) {
-			delete sa;
-			allocators.pop_back();
-			size *= 0.5;
-		}
-	}
-	StackAllocator* currentAllocator() const {
-		return allocators.back();
-	}
+  void expand() {
+    allocators.push_back(new StackAllocator(size *= 2));
+  }
+  void contractIfLastEmpty() {
+    if (allocators.size() < 2) return;
+    StackAllocator *sa = currentAllocator();
+    if (sa->isEmpty()) {
+      delete sa;
+      allocators.pop_back();
+      size *= 0.5;
+    }
+  }
+  StackAllocator* currentAllocator() const {
+    return allocators.back();
+  }
 };
 
 #endif

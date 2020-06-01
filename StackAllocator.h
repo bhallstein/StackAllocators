@@ -13,39 +13,39 @@ typedef unsigned char uint8_t;
 
 class StackAllocator {
 public:
-	StackAllocator(int _size) : size(_size), arr(new uint8_t[_size]) {  }
-	~StackAllocator() { delete [] arr; }
+  StackAllocator(int _size) : size(_size), arr(new uint8_t[_size]) {  }
+  ~StackAllocator() { delete [] arr; }
 
-	template<class T>
-	T* allocate() {
-		return (T*) allocate(sizeof(T));
-	}
+  template<class T>
+  T* allocate() {
+    return (T*) allocate(sizeof(T));
+  }
 
-	void* allocate(int bytes_for_object) {
-		if (bytes_for_object > bytes_remaining())
-			return NULL;
+  void* allocate(int bytes_for_object) {
+    if (bytes_for_object > bytes_remaining())
+      return NULL;
 
-		void *p_obj  = (void*) (arr + offset);
-		offset += bytes_for_object;
+    void *p_obj  = (void*) (arr + offset);
+    offset += bytes_for_object;
 
-		return p_obj;
-	}
+    return p_obj;
+  }
 
-	inline bool isEmpty() const {
-		return offset == 0;
-	}
+  inline bool isEmpty() const {
+    return offset == 0;
+  }
 
 private:
-	StackAllocator(const StackAllocator &) { }
-	StackAllocator operator= (const StackAllocator &) { return StackAllocator(32); }
+  StackAllocator(const StackAllocator &) { }
+  StackAllocator operator= (const StackAllocator &) { return StackAllocator(32); }
 
-	uint8_t *arr;
-	int offset = 0;
-	int size;
+  uint8_t *arr;
+  int offset = 0;
+  int size;
 
-	inline int bytes_remaining() {
-		return size - offset;
-	}
+  inline int bytes_remaining() {
+    return size - offset;
+  }
 };
 
 #endif

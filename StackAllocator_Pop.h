@@ -1,70 +1,70 @@
 //
-// StackAllocator_Poppable.h
+// StackAllocator_Pop.h
 //
 // - items can be popped of the end of the stack
 // - in order to do this, the size of the object is stored alongside it
 //
 
-#ifndef __StackAllocator_Poppable_h
-#define __StackAllocator_Poppable_h
+#ifndef __StackAllocator_Pop_h
+#define __StackAllocator_Pop_h
 
 #include <cstdint>
 
 #ifdef __PSA_PSIZE_TYPE
-	typedef __PSA_PSIZE_TYPE _psize;
+  typedef __PSA_PSIZE_TYPE _psize;
 #else
-	typedef uint16_t _psize;
+  typedef uint16_t _psize;
 #endif
 
-class StackAllocator_Poppable {
+class StackAllocator_Pop {
 public:
-	StackAllocator_Poppable(int _size) : size(_size), arr(new uint8_t[_size]) {  }
-	~StackAllocator_Poppable() { delete [] arr; }
+  StackAllocator_Pop(int _size) : size(_size), arr(new uint8_t[_size]) {  }
+  ~StackAllocator_Pop() { delete [] arr; }
 
-	template<class T>
-	T* allocate() {
-		return (T*) allocate(sizeof(T));
-	}
+  template<class T>
+  T* allocate() {
+    return (T*) allocate(sizeof(T));
+  }
 
-	void* allocate(int bytes_for_object) {
-		size_t bytes_required = bytes_for_object + sizeof(_psize);
+  void* allocate(int bytes_for_object) {
+    size_t bytes_required = bytes_for_object + sizeof(_psize);
 
-		if (bytes_required > bytes_remaining()) {
-			return NULL;
-		}
+    if (bytes_required > bytes_remaining()) {
+      return NULL;
+    }
 
-		// The layout is { object, object_size_in_bytes }
-		void *p_obj  = (void*) (arr + offset);
-		_psize *p_size = (_psize*) (arr + offset + bytes_for_object);
+    // The layout is { object, object_size_in_bytes }
+    void *p_obj  = (void*) (arr + offset);
+    _psize *p_size = (_psize*) (arr + offset + bytes_for_object);
 
-		*p_size = bytes_for_object;
+    *p_size = bytes_for_object;
 
-		offset += bytes_required;
-		return p_obj;
-	}
+    offset += bytes_required;
+    return p_obj;
+  }
 
-	void pop() {
-		if (isEmpty()) return;
+  void pop() {
+    if (isEmpty()) return;
 
-		_psize *p_size = (_psize*) (arr + offset - sizeof(_psize));
-		offset -= (sizeof(_psize) + *p_size);
-	}
+    _psize *p_size = (_psize*) (arr + offset - sizeof(_psize));
+    offset -= (sizeof(_psize) + *p_size);
+  }
 
-	bool isEmpty() const {
-		return offset == 0;
-	}
+  bool isEmpty() const {
+    return offset == 0;
+  }
 
 private:
-	StackAllocator_Poppable(const StackAllocator_Poppable &) { }
-	StackAllocator_Poppable operator= (const StackAllocator_Poppable &) { return *this; }
+  StackAllocator_Pop(const StackAllocator_Pop &) { }
+  StackAllocator_Pop operator= (const StackAllocator_Pop &) { return *this; }
 
-	uint8_t *arr;
-	int offset = 0;
-	int size;
+  uint8_t *arr;
+  int offset = 0;
+  int size;
 
-	int bytes_remaining() const {
-		return size - offset;
-	}
+  int bytes_remaining() const {
+    return size - offset;
+  }
 };
 
 #endif
